@@ -1,0 +1,28 @@
+/* -------------> Post Favorite Item request <------------ */
+exports.postFavoriteItem = function(request, response) {
+  var favoriteOffers = Parse.Object.extend("FavoriteOffers");
+  var query = new Parse.Query("FavoriteOffers");
+  query.equalTo("user", request.user);
+  query.equalTo("id", request.params.id);
+  query.equalTo("type", request.params.type);
+  query.first().then(function(result) {
+    if (result == null) {
+      var offer = new favoriteOffers();
+      offer.save({
+        user: request.user,
+        id: request.params.id,
+        type: request.params.type,
+      }, {
+        success: function() {
+          // Do smth after successful save such as subscribe 
+        }, error: function(error) {
+          response.error(error);
+        }
+      });
+    } else {
+      response.success("Offer already pinned");
+    }
+  }, function(error) {
+    response.error(error);
+  });
+}
